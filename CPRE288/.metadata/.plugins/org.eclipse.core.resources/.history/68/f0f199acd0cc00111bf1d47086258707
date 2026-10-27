@@ -1,0 +1,38 @@
+/*
+ * acd.c
+ *
+ *  Created on: Oct 20, 2026
+ *      Author: alex2168
+ */
+
+
+void adc_init() {
+    // Configure GPIO PB4
+    SYSCTL_RCGCGPIO_R |= 0b10; // Enable clock for port B
+    GPIO_PORTB_AFSEL_R |= 0b10000; // Alternate mode for pin 4
+    GPIO_PORTB_ADCCTL_R |= 0b10000; // Allow pin B4 to trigger adc
+    GPIO_PORTB_AMSEL_R |= 0b10000; // Enables analog mode for B4
+    GPIO_PORTB_DEN_R &= ~0b10000; // Disable digital output for B4
+    GPIO_PORTB_DIR_R &= ~0b10000; // Make B4 and input
+
+    // Configure ADC
+    ADC0_ACTSS_R = 0x0; // Disable
+    ADC0_EMUX_R = 0xF; // Continuously sample
+    SYSCTL_RCGCADC_R |= 0b01; // Enable clock for ADC module 0
+    ADC0_SSMUX0_R = 0xA; // AIN10
+    ADC0_SSCTL0_R = 0x20000000; // The 8th sample(sample 7) is the last sample in the sequence
+
+
+
+    ADC0_ACTSS_R = ADC_ACTSS_ASEN0; // Enable SS0
+}
+
+int adc_read() {
+
+
+
+
+    return 0;
+}
+
+

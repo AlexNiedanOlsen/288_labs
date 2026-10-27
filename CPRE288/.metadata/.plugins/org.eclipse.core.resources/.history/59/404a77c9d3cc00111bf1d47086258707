@@ -1,0 +1,32 @@
+
+
+/**
+ * main.c
+ */
+
+#include "timer.h"
+#include "lcd.h"
+
+#define _PART1 1
+#define _PART2 0
+#define _PART3 0
+#define _PART4
+
+int main(void)
+{
+#if _PART1
+    lcd_clear();
+    int value;
+    adc_init();
+    lcd_init();
+    timer_init();
+
+    while(1) {
+       value = adc_read();
+       lcd_printf("%d", value);
+       timer_waitMillis(200);
+       lcd_clear();
+    }
+#endif
+	return 0;
+}

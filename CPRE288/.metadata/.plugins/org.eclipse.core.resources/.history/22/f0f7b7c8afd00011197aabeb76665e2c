@@ -1,0 +1,61 @@
+
+
+/**
+ * main.c
+ */
+
+#include "adc.h"
+#include "timer.h"
+#include "lcd.h"
+#include <math.h>
+
+#define _PART1 0
+#define _PART2 1
+#define _PART3 0
+#define _PART4 0
+
+int main(void)
+{
+    adc_init();
+    lcd_init();
+    timer_init();
+#if _PART1
+
+    int value;
+    adc_init();
+    lcd_init();
+    timer_init();
+    lcd_clear();
+
+    while(1) {
+       value = adc_read();
+       lcd_printf("IR: %d\n", value);
+
+       timer_waitMillis(200);
+       lcd_clear();
+    }
+#endif
+
+#if _PART2
+    int value;
+    float IR_scaled;
+    while(1) {
+        value = adc_read();
+        if (value < 1460)
+        {
+            IR_scaled = 0.00006067*pow(value, 2)-.21196*value+209.041 - 1;
+        }
+        else {
+            IR_scaled = (112.8276*pow(M_E, (-0.00108*value))+4.831) - 1;
+        }
+
+        if(value > 40) {
+            value += 3;
+        }
+        lcd_printf("IR: %d \t\t Scaled: %f\n", value, IR_scaled);
+        timer_waitMillis(200);
+        lcd_clear();
+    }
+#endif
+	return 0;
+}

@@ -1,0 +1,97 @@
+
+
+/**
+ * main.c
+ */
+
+#include "adc.h"
+#include "timer.h"
+#include "lcd.h"
+#include <math.h>
+
+#define _PART1 0
+#define _PART2 1
+#define _PART3 0
+#define _PART4 0
+
+int main(void)
+{
+    adc_init();
+    lcd_init();
+    timer_init();
+#if _PART1
+
+    int value;
+    adc_init();
+    lcd_init();
+    timer_init();
+    lcd_clear();
+
+    while(1) {
+       value = adc_read();
+       lcd_printf("IR: %d\n", value);
+
+       timer_waitMillis(200);
+       lcd_clear();
+    }
+#endif
+
+#if _PART2
+    int value;
+    float IR_scaled;
+    while(1) {
+
+        float average;
+        float accumulator = 0;
+        float values[5];
+        int z;
+        for (z = 0;z < 5; z++) {
+            value = adc_read();
+            if (value < 1460)
+            {
+                IR_scaled = 0.00006067*pow(value, 2)-.21196*value+209.041 - 1;
+            }
+            else {
+                IR_scaled = (112.8276*pow(M_E, (-0.00108*value))+4.831) - 1;
+            }
+            accumulator += IR_scaled;
+            values[z] = IR_scaled;
+                }
+                float middle_values[3];
+                int biggest = values[0];
+                int smallest = values[0];
+
+                for(z = 1; z < 5; z++) {
+                    if(values[z] > biggest) {
+                        biggest = values[z];
+                    }
+                    if(values[z] < smallest) {
+                        smallest = values[z];
+                    }
+                }
+                int j = 0;
+                for(z = 0; z < 5; z++) {
+                    if(values[z] != biggest || values[z] != smallest) {
+                        middle_values[j] = values[z];
+                        j++;
+                    }
+                }
+
+              //  average = accumulator/5; // averaging mech (needed for lab)
+
+                average = (middle_values[0] + middle_values[1] +  middle_values[2]) / 3;
+                if(average < 10) { // average when between 9 and 12
+                    average += 2;
+                }
+                if(average > 37) {
+                    average -= 1;
+                }
+
+
+        lcd_printf("IR: %d \t\t Scaled: %f\n", value, IR_scaled);
+        timer_waitMillis(200);
+        lcd_clear();
+    }
+#endif
+	return 0;
+}
